@@ -1,0 +1,59 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<winsock2.h>
+#define DEFAULT_LEN 1024
+#define DEFAULT_PORT 4600
+#define DEFAULT_IP "127.0.0.1"
+#pragma comment(lib, "ws2_32.lib")
+DWORD WINAPI threadpro(LPVOID pParam) {
+	SOCKET hsock = (SOCKET)pParam;
+	CHAR buffer[1024];
+	char sendBuffer[1024];
+	if (hsock != INVALID_SOCKET)
+		printf("START Receive\n");
+	while (TRUE) {
+		INT num = recv(hsock, buffer, DEFAULT_LEN, 0);
+		if (num >= 0)
+			printf("Receive from client %s\n", buffer);
+		if (!strcmp(buffer, "A")) {
+			memset(sendBuffer, 0, DEFAULT_LEN);
+			strcpy(sendBuffer, "B");
+			INT ires = send(hsock, sendBuffer, sizeof(sendBuffer), 0);
+			printf("Send to client %s\n", sendBuffer);
+			continue;
+		}
+		if (!strcmp(buffer, "C")) {
+			memset(sendBuffer, 0, DEFAULT_LEN);
+			strcpy(sendBuffer, "D");
+			INT ires = send(hsock, sendBuffer, sizeof(sendBuffer), 0);
+			printf("Send to client %s\n", sendBuffer);
+			continue;
+		}
+		if (!strcmp(buffer, "exit")) {
+			return 0;
+		}
+		memset(sendBuffer, 0, DEFAULT_LEN);
+		strcpy(sendBuffer, "ERR");
+		INT ires = send(hsock, sendBuffer, sizeof(sendBuffer), 0);
+		printf("Send to client %s\n", sendBuffer);
+	}
+	return 0;
+}
+VOID main() {
+	WSADATA wsd;
+	WSAStartup(MAKEWORD(2, 2), &wsd);
+	SOCKET m_SockServer;
+	sockaddr_in serveraddr;
+	sockaddr_in serveraddrfrom;
+	SOCKET m_Server[20];
+
+	serveraddr.sin_family = AF_INET;
+	serveraddr.sin_port = DEFAULT_PORT;
+	serveraddr.sin_addr.S_un.S_addr = inet_addr(DEFAULT_IP);;
+
+	m_SockServer = socket(AF_INET, SOCK_STREAM, 0);
+	INT i = bind(m_SockServer, (sockaddr*)&serveraddr, sizeof(serveraddr));
+	printf("bind %d\n", i);
+
+	INT iMas
+}
